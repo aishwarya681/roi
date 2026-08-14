@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tradespace ROI — RaySearch Laboratories</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --ink: #0e1116;
+    --muted: #6b7280;
+    --card-dark: #0b0d14;
+    --card-border: #1f2430;
+    --pink: #ec4899;
+    --blue: #3b82f6;
+    --purple-1: #2a1a5e;
+    --purple-2: #4c1d95;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--purple-1) 0%, var(--purple-2) 55%, #1e1b4b 100%);
+    padding: 56px 48px 64px;
+    color: white;
+  }
+  .eyebrow {
+    color: var(--pink);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-size: 40px;
+    line-height: 1.15;
+    margin: 0 0 8px;
+    font-weight: 700;
+    max-width: 720px;
+  }
+  .hero .accent { background: linear-gradient(90deg, #60a5fa, #f472b6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.sub { color: #cbd5e1; font-size: 15px; margin: 12px 0 0; max-width: 600px; }
+
+  .wrap { max-width: 1080px; margin: -32px auto 0; padding: 0 24px 64px; display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
+  @media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.06);
+  }
+  .panel .step-label { color: var(--blue); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .panel h2 { font-size: 22px; margin: 0 0 20px; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .field .value {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-weight: 600;
+    background: #fafafa;
+  }
+  .step2 { margin-top: 28px; padding-top: 24px; border-top: 1px solid #eee; }
+  .slider-row { margin-bottom: 20px; }
+  .slider-row .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .slider-row .top span:first-child { font-size: 13px; color: var(--muted); }
+  .slider-row .top span:last-child { font-weight: 700; }
+  .track { position: relative; height: 6px; border-radius: 4px; background: #e5e7eb; }
+  .track .fill { position: absolute; top:0; left:0; height:100%; border-radius: 4px; width: 50%; }
+  .track.pink .fill { background: var(--pink); }
+  .track.blue .fill { background: var(--blue); }
+  .track .dot { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; background: white; border: 3px solid; border-radius: 50%; transform: translate(-50%, -50%); }
+  .track.pink .dot { border-color: var(--pink); }
+  .track.blue .dot { border-color: var(--blue); }
+  .scale { display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+  .right { display: flex; flex-direction: column; gap: 20px; }
+  .savings-card {
+    background: var(--card-dark);
+    border-radius: 16px;
+    padding: 32px;
+    color: white;
+  }
+  .savings-card .eyebrow2 { color: var(--pink); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .savings-card .big { font-size: 52px; font-weight: 700; margin: 0 0 24px; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .stat {
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+  }
+  .stat.with-ts { border-color: rgba(59,130,246,0.5); }
+  .stat.reduction { border-color: rgba(236,72,153,0.5); }
+  .stat .label { font-size: 12px; color: #9ca3af; margin-bottom: 8px; }
+  .stat .num { font-size: 22px; font-weight: 700; }
+  .stat.with-ts .num { color: #60a5fa; }
+  .stat.reduction .num { color: var(--pink); }
+
+  .breakdown {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .breakdown h3 { font-size: 13px; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; margin: 0 0 18px; text-transform: uppercase; }
+  .line { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #eee; }
+  .line:last-of-type { border-bottom: none; }
+  .line .name { font-weight: 700; font-size: 15px; }
+  .line .detail { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .line .amount { font-weight: 700; font-size: 18px; color: var(--pink); }
+
+  .assumptions {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed #e5e7eb;
+  }
+
+  .footer-note {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .footer-note strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="eyebrow">ROI CALCULATOR · TRADESPACE</div>
+    <h1>What scale looks like for <span class="accent">RaySearch Laboratories'</span> portfolio</h1>
+    <p class="sub">Directional projection based on RaySearch's public patent filing activity. Prepared for a leadership conversation.</p>
+  </div>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="step-label">STEP 01 / YOUR PORTFOLIO</div>
+      <h2>Current filing volume</h2>
+
+      <div class="field">
+        <label>Provisional filings / yr</label>
+        <div class="value">5</div>
+      </div>
+      <div class="field">
+        <label>Non-provisional filings / yr</label>
+        <div class="value">5</div>
+      </div>
+      <div class="field">
+        <label>Current cost / provisional</label>
+        <div class="value">$2,500</div>
+      </div>
+      <div class="field">
+        <label>Current cost / non-provisional</label>
+        <div class="value">$20,000</div>
+      </div>
+
+      <div class="step2">
+        <div class="step-label">STEP 02 / TRADESPACE MIX</div>
+        <h2 style="font-size:18px; margin-bottom:16px;">How much routed through us?</h2>
+
+        <div class="slider-row">
+          <div class="top"><span>Provisional via Tradespace</span><span>50%</span></div>
+          <div class="track pink"><div class="fill"></div><div class="dot" style="left:50%"></div></div>
+          <div class="scale"><span>0%</span><span>100%</span></div>
+        </div>
+
+        <div class="slider-row">
+          <div class="top"><span>Non-provisional via Tradespace</span><span>50%</span></div>
+          <div class="track blue"><div class="fill"></div><div class="dot" style="left:50%"></div></div>
+          <div class="scale"><span>0%</span><span>100%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="savings-card">
+        <div class="eyebrow2">TOTAL ANNUAL SAVINGS</div>
+        <div class="big">$51,250</div>
+        <div class="stat-row">
+          <div class="stat">
+            <div class="label">Before</div>
+            <div class="num">$142,500</div>
+          </div>
+          <div class="stat with-ts">
+            <div class="label">With Tradespace</div>
+            <div class="num">$91,250</div>
+          </div>
+          <div class="stat reduction">
+            <div class="label">Reduction</div>
+            <div class="num">36.0%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <h3>Savings breakdown</h3>
+
+        <div class="line">
+          <div>
+            <div class="name">Provisional filings</div>
+            <div class="detail">3 filings &times; $1,500 saved each</div>
+          </div>
+          <div class="amount">$3,750</div>
+        </div>
+
+        <div class="line">
+          <div>
+            <div class="name">Non-provisional filings</div>
+            <div class="detail">3 filings &times; $15,000 saved each</div>
+          </div>
+          <div class="amount">$37,500</div>
+        </div>
+
+        <div class="line">
+          <div>
+            <div class="name">Office actions</div>
+            <div class="detail">6 office actions &times; $2,000 saved each</div>
+          </div>
+          <div class="amount">$10,000</div>
+        </div>
+
+        <div class="assumptions">
+          <strong>Assumptions:</strong> Tradespace flat fees: $1,000 / provisional, $5,000 / non-provisional, $1,000 / office action. Baseline office-action cost $3,000 each; 2 office actions modeled per non-provisional filing. Office actions and non-provisionals routed at the same rate. Figures are directional estimates based on the inputs above.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <strong>How the filing volume was estimated:</strong> RaySearch Laboratories has ~109 patent families on record (Google Patents, assignee search), with roughly 10 new families filed in the 2023&ndash;2025 window &mdash; split evenly here into 5 provisional / 5 non-provisional filings per year. Cost-per-filing and Tradespace routing mix use Tradespace's generic default assumptions ($2,500/provisional, $20,000/non-provisional, 50/50 routing), since actual RaySearch outside-counsel costs aren't public. Treat this as a directional starting point for a conversation, not a quote.
+  </div>
+
+</body>
+</html>
