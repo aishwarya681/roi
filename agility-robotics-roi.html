@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tradespace ROI Estimate — Agility Robotics</title>
+<style>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --border:         rgba(11,11,11,0.10);
+    --blue:           #2a78d6;
+    --pink:           #e34948;
+    --dark-surface:   #12131a;
+    --dark-surface-2: #171827;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin: 0 0 8px;
+  }
+
+  h1 {
+    font-size: 30px;
+    font-weight: 650;
+    line-height: 1.25;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin: 0 0 32px;
+  }
+
+  .assumptions-note {
+    font-size: 13px;
+    color: var(--text-muted);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 32px;
+  }
+
+  .assumptions-note strong { color: var(--text-secondary); }
+
+  /* Inputs panel */
+  .panel {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  .panel-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin: 0 0 4px;
+  }
+
+  .panel-title {
+    font-size: 19px;
+    font-weight: 650;
+    margin: 0 0 20px;
+  }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .input-item {
+    background: var(--page-plane);
+    border: 1px solid var(--gridline);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .input-item .k {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 6px;
+  }
+
+  .input-item .v {
+    font-size: 20px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+
+  .mix-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gridline);
+    font-size: 14px;
+  }
+
+  .mix-row .k { color: var(--text-secondary); }
+  .mix-row .v { font-weight: 650; color: var(--blue); font-variant-numeric: tabular-nums; }
+
+  /* Hero savings card */
+  .hero {
+    background: linear-gradient(160deg, var(--dark-surface), var(--dark-surface-2));
+    border-radius: 16px;
+    padding: 32px;
+    color: #ffffff;
+    margin-bottom: 24px;
+  }
+
+  .hero-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #e87ba4;
+    margin: 0 0 10px;
+  }
+
+  .hero-figure {
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 24px;
+    line-height: 1;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .stat-tile {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+  }
+
+  .stat-tile .k {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    margin: 0 0 8px;
+  }
+
+  .stat-tile .v {
+    font-size: 24px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-tile.before .v { color: #ffffff; }
+  .stat-tile.with .v { color: #6da7ec; }
+  .stat-tile.reduction .v { color: #e87ba4; }
+
+  /* Breakdown */
+  .breakdown-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 32px 0 12px;
+  }
+
+  .breakdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+  }
+
+  .breakdown-item .name {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .breakdown-item .detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .breakdown-item .amount {
+    font-size: 20px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    color: var(--blue);
+    white-space: nowrap;
+    padding-left: 24px;
+  }
+
+  .footer-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 28px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 640px) {
+    .input-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Tradespace ROI Estimate</p>
+  <h1>Agility Robotics</h1>
+  <p class="subtitle">Directional projection for a leadership conversation — 50% of filing volume routed through Tradespace.</p>
+
+  <div class="assumptions-note">
+    <strong>Note:</strong> Agility Robotics' actual filing volume and outside-counsel costs were not available, so this run uses estimated inputs typical of a well-funded, mid-scale robotics/hardware company. Treat the output as directional, not a quote — swap in real numbers once available.
+  </div>
+
+  <div class="panel">
+    <p class="panel-label">Step 01</p>
+    <p class="panel-title">Current filing volume (estimated inputs)</p>
+    <div class="input-grid">
+      <div class="input-item">
+        <p class="k">Provisional filings / yr</p>
+        <p class="v">15</p>
+      </div>
+      <div class="input-item">
+        <p class="k">Non-provisional filings / yr</p>
+        <p class="v">10</p>
+      </div>
+      <div class="input-item">
+        <p class="k">Current cost / provisional</p>
+        <p class="v">$4,000</p>
+      </div>
+      <div class="input-item">
+        <p class="k">Current cost / non-provisional</p>
+        <p class="v">$18,000</p>
+      </div>
+    </div>
+    <div class="mix-row">
+      <span class="k">Provisional routed through Tradespace</span>
+      <span class="v">50%</span>
+    </div>
+    <div class="mix-row">
+      <span class="k">Non-provisional routed through Tradespace</span>
+      <span class="v">50%</span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <p class="hero-label">Total Annual Savings</p>
+    <p class="hero-figure">$107,500</p>
+    <div class="stat-row">
+      <div class="stat-tile before">
+        <p class="k">Before</p>
+        <p class="v">$300,000</p>
+      </div>
+      <div class="stat-tile with">
+        <p class="k">With Tradespace</p>
+        <p class="v">$192,500</p>
+      </div>
+      <div class="stat-tile reduction">
+        <p class="k">Reduction</p>
+        <p class="v">35.8%</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="breakdown-title">Savings breakdown</p>
+
+  <div class="breakdown-item">
+    <div>
+      <p class="name">Provisional filings</p>
+      <p class="detail">8 filings × $3,000 saved each</p>
+    </div>
+    <p class="amount">$22,500</p>
+  </div>
+
+  <div class="breakdown-item">
+    <div>
+      <p class="name">Non-provisional filings</p>
+      <p class="detail">5 filings × $13,000 saved each</p>
+    </div>
+    <p class="amount">$65,000</p>
+  </div>
+
+  <div class="breakdown-item">
+    <div>
+      <p class="name">Office actions</p>
+      <p class="detail">10 office actions × $2,000 saved each</p>
+    </div>
+    <p class="amount">$20,000</p>
+  </div>
+
+  <p class="footer-note">
+    Assumptions: Tradespace flat fees of $1,000/provisional, $5,000/non-provisional, $1,000/office action. Baseline office-action cost modeled at $3,000 each, with 2 office actions per non-provisional filing. Office actions and non-provisionals routed at the same rate. Source: tradespace.io/roi-calculator, run on Agility Robotics estimates.
+  </p>
+
+</div>
+</body>
+</html>
