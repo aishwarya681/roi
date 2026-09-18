@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Brain Break — Clarkson x Tradespace</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Arial,sans-serif;background:linear-gradient(160deg,#060d18 0%,#0c1a2e 45%,#081320 100%);min-height:100vh;color:#e8edf5;padding:32px 16px 64px}
+.wrap{max-width:760px;margin:0 auto}
+.hdr{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,#8b5cf6,#8b5cf6cc);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:#fff;flex-shrink:0}
+.logo-text{font-size:18px;font-weight:700;color:#fff}
+.divider{height:1px;background:linear-gradient(90deg,#8b5cf655 0%,#8b5cf608 100%);margin:16px 0 28px}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:#8b5cf6;margin-bottom:8px}
+.hero-title{font-size:26px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:10px}
+.hero-title span{background:linear-gradient(90deg,#8b5cf6,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:14px;color:#94a3be;line-height:1.6;margin-bottom:28px}
+.game-area{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:32px}
+.grid-wrap{flex:1;min-width:280px}
+.grid{display:grid;grid-template-columns:repeat(15,1fr);gap:2px;user-select:none;cursor:crosshair;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#94a3be;border-radius:4px;transition:background 0.1s,color 0.1s}
+.cell.selected{background:#8b5cf644;color:#fff}
+.cell.found{background:#8b5cf633;color:#8b5cf6;font-weight:800}
+.word-panel{min-width:140px;display:flex;flex-direction:column;gap:6px;padding-top:4px}
+.word-panel-label{font-size:10px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:#8b5cf6;margin-bottom:4px}
+.word-item{font-size:13px;color:#64748b;display:flex;align-items:center;gap:8px;transition:color 0.2s}
+.word-item.found{color:#8b5cf6;text-decoration:line-through}
+.wi-check{font-size:14px}
+.status{font-size:13px;color:#64748b;margin-top:10px;height:20px}
+/* ROI unlock */
+.roi-locked{position:relative}
+.roi-overlay{position:absolute;inset:0;background:rgba(6,13,24,0.88);backdrop-filter:blur(6px);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10;transition:opacity 0.5s}
+.roi-overlay.hidden{opacity:0;pointer-events:none}
+.lock-icon{font-size:40px}
+.lock-msg{font-size:14px;color:#64748b;text-align:center;max-width:220px;line-height:1.5}
+.roi-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:28px 24px;position:relative;overflow:hidden}
+.roi-hl{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#8b5cf6,#8b5cf644)}
+.roi-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#8b5cf6;margin-bottom:14px}
+.roi-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:6px}
+.roi-sub{font-size:13px;color:#64748b;margin-bottom:22px;line-height:1.5}
+.roi-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:22px}
+.roi-stat{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 12px}
+.roi-stat-label{font-size:10px;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.8px}
+.roi-stat-val{font-size:19px;font-weight:800;color:#fff}
+.roi-stat-val.green{color:#22c55e}
+.roi-stat-val.blue{color:#8b5cf6}
+.roi-breakdown{font-size:12px;color:#64748b;line-height:1.8;border-top:1px solid rgba(255,255,255,0.07);padding-top:16px;margin-bottom:18px}
+.roi-breakdown strong{color:#94a3be}
+.roi-insight{background:rgba(8b,5c,f6,0.07);border-left:3px solid #8b5cf6;border-radius:0 10px 10px 0;padding:14px 16px;font-size:13px;color:#cbd5e1;line-height:1.65;margin-bottom:18px}
+.roi-cta{display:inline-block;background:linear-gradient(135deg,#8b5cf6,#8b5cf699);color:#fff;font-size:13px;font-weight:700;padding:11px 22px;border-radius:8px;text-decoration:none;border:none;cursor:pointer}
+.win-banner{background:linear-gradient(90deg,#8b5cf622,#8b5cf608);border:1px solid #8b5cf644;border-radius:10px;padding:12px 16px;font-size:14px;color:#8b5cf6;font-weight:600;margin-bottom:16px;display:none;text-align:center}
+.win-banner.show{display:block}
+footer{margin-top:48px;border-top:1px solid rgba(255,255,255,0.06);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.foot-copy{font-size:11px;color:#334155}
+.foot-link{font-size:11px;color:#8b5cf6;text-decoration:none}
+@media(max-width:560px){.roi-grid{grid-template-columns:1fr 1fr}.game-area{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="logo-mark">T</div>
+    <div class="logo-text">Tradespace</div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="hero-label">Brain Break · Built for Clarkson</div>
+  <h1 class="hero-title">Find the 5 words —<br><span>then unlock your estimated ROI</span></h1>
+  <p class="hero-sub">Five terms every IP professional lives with. Find them all and we'll show you what routing 50% of Clarkson's engineering, health sciences, and technology research filings through Tradespace could save annually — while keeping your current outside patent counsel on the matters that need them most.</p>
+
+  <div class="game-area">
+    <div class="grid-wrap">
+      <div class="grid" id="grid" onmousedown="startSel(event)" onmouseover="extSel(event)" onmouseup="endSel(event)"></div>
+      <div class="status" id="status"></div>
+    </div>
+    <div class="word-panel">
+      <div class="word-panel-label">Find these words</div>
+      <div class="word-item" id="wi-DISCLOSURE" data-word="DISCLOSURE"><span class="wi-check">○</span> DISCLOSURE</div><div class="word-item" id="wi-PORTFOLIO" data-word="PORTFOLIO"><span class="wi-check">○</span> PORTFOLIO</div><div class="word-item" id="wi-LICENSING" data-word="LICENSING"><span class="wi-check">○</span> LICENSING</div><div class="word-item" id="wi-DRAFTING" data-word="DRAFTING"><span class="wi-check">○</span> DRAFTING</div><div class="word-item" id="wi-INVENTOR" data-word="INVENTOR"><span class="wi-check">○</span> INVENTOR</div>
+    </div>
+  </div>
+
+  <div class="win-banner" id="winBanner">🎉 Puzzle complete — your ROI is unlocked below!</div>
+
+  <div class="roi-locked">
+    <div class="roi-overlay" id="overlay">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-msg">Find all 5 words to unlock your estimated ROI for Clarkson</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-hl"></div>
+      <div class="roi-label">Your Estimated Annual Savings · 50% Mix</div>
+      <div class="roi-title">You could save $55,500 per year</div>
+      <div class="roi-sub">Based on Clarkson's estimated US filing volume — 15 provisionals and 10 non-provisionals annually — at 50% routed through Tradespace's flat-fee Attorney/AI partnership. Your current outside patent counsel stays on for the complex matters.</div>
+      <div class="roi-grid">
+        <div class="roi-stat">
+          <div class="roi-stat-label">Current annual spend</div>
+          <div class="roi-stat-val blue">$197,500</div>
+        </div>
+        <div class="roi-stat">
+          <div class="roi-stat-label">With Tradespace (50%)</div>
+          <div class="roi-stat-val">$142,000</div>
+        </div>
+        <div class="roi-stat">
+          <div class="roi-stat-label">Annual savings</div>
+          <div class="roi-stat-val green">$55,500</div>
+        </div>
+      </div>
+      <div class="roi-breakdown">
+        <strong>Provisionals:</strong> 7 of 15 routed → saves $10,500 ($2,500 → $1,000 flat)<br>
+        <strong>Non-provisionals:</strong> 5 of 10 routed → saves $25,000 ($10,000 → $5,000 flat)<br>
+        <strong>Office actions:</strong> 10 OAs at 5 per filing → saves $20,000 ($3,000 → $1,000 flat)<br>
+        <strong>Reduction:</strong> 28% off current annual IP prosecution budget
+      </div>
+      <div class="roi-insight">
+        <strong>How this works in practice:</strong> Tradespace handles provisionals, design patents, continuation filings, and straightforward utility applications through AI-assisted drafting and our 250+ attorney network — all at flat fees. your current outside patent counsel stays on the docket for contested prosecution, IPR/PTAB, cross-border strategy, and matters that need senior partner relationships. The result: the same outside counsel coverage on complex work, plus 50% of your filing volume handled faster and at a fraction of the cost — freeing budget and bandwidth for the IP strategy decisions that actually move the needle.
+      </div>
+      <button class="roi-cta" onclick="window.open('https://go.tradespace.io/live-demo-request.html','_blank')">See a live walkthrough for Clarkson</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="foot-copy">© 2026 Tradespace · Built for Clarkson</div>
+    <a class="foot-link" href="https://tradespace.io/roi-calculator/">Try the full ROI calculator →</a>
+  </footer>
+</div>
+<script>
+const GRID=[["Z","P","O","R","T","F","O","L","I","O","B","D","X","O","R"],["D","M","C","R","J","U","D","T","L","S","G","I","W","C","B"],["V","H","Y","J","R","C","R","H","D","M","I","S","O","U","L"],["F","L","L","G","O","V","A","I","W","V","U","C","C","T","U"],["F","R","X","H","T","F","F","O","M","I","U","L","W","R","H"],["V","K","Y","Y","N","B","T","H","B","Z","K","O","M","I","C"],["G","S","W","K","E","G","I","U","P","M","U","S","O","E","I"],["E","H","X","R","V","R","N","I","X","S","N","U","S","M","L"],["H","E","Q","P","N","C","G","Y","B","D","E","R","U","F","Z"],["V","N","T","C","I","M","M","T","O","Q","I","E","R","A","V"],["X","D","V","R","Y","I","Y","U","K","D","J","N","F","O","A"],["X","X","I","Q","Y","F","Q","D","U","J","U","Q","T","G","E"],["L","Y","F","R","Y","G","N","I","S","N","E","C","I","L","Q"],["A","T","K","P","A","D","L","Z","J","H","B","H","S","C","C"],["X","P","C","Y","R","Y","E","E","V","P","R","F","I","Q","T"]];
+const PLACED=[{word:"DISCLOSURE",cells:[[0,11],[1,11],[2,11],[3,11],[4,11],[5,11],[6,11],[7,11],[8,11],[9,11]]},{word:"PORTFOLIO",cells:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]},{word:"LICENSING",cells:[[12,13],[12,12],[12,11],[12,10],[12,9],[12,8],[12,7],[12,6],[12,5]]},{word:"DRAFTING",cells:[[1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6]]},{word:"INVENTOR",cells:[[9,4],[8,4],[7,4],[6,4],[5,4],[4,4],[3,4],[2,4]]}];
+const WORDS=['DISCLOSURE', 'PORTFOLIO', 'LICENSING', 'DRAFTING', 'INVENTOR'];
+
+const gridEl=document.getElementById("grid");
+const overlayEl=document.getElementById("overlay");
+const winBanner=document.getElementById("winBanner");
+let foundWords=new Set();
+let selecting=false;
+let selStart=null,selEnd=null;
+let allCells=[];
+
+// Build grid DOM
+for(let r=0;r<15;r++){
+  for(let c=0;c<15;c++){
+    const d=document.createElement("div");
+    d.className="cell";
+    d.textContent=GRID[r][c];
+    d.dataset.r=r;d.dataset.c=c;
+    gridEl.appendChild(d);
+    allCells.push(d);
+  }
+}
+
+function cellAt(r,c){return allCells[r*15+c];}
+
+function highlightSel(){
+  allCells.forEach(c=>{if(!c.classList.contains("found"))c.classList.remove("selected");});
+  if(!selStart||!selEnd)return;
+  const [r1,c1]=selStart,r2=parseInt(selEnd.dataset.r),c2=parseInt(selEnd.dataset.c);
+  const dr=Math.sign(r2-r1),dc=Math.sign(c2-c1);
+  const dist=Math.max(Math.abs(r2-r1),Math.abs(c2-c1));
+  if(dr!==0&&dc!==0&&Math.abs(r2-r1)!==Math.abs(c2-c1))return;
+  for(let i=0;i<=dist;i++){
+    const cr=r1+dr*i,cc=c1+dc*i;
+    if(cr>=0&&cr<15&&cc>=0&&cc<15)cellAt(cr,cc).classList.add("selected");
+  }
+}
+
+function getSelStr(){
+  if(!selStart||!selEnd)return"";
+  const [r1,c1]=selStart,r2=parseInt(selEnd.dataset.r),c2=parseInt(selEnd.dataset.c);
+  const dr=Math.sign(r2-r1),dc=Math.sign(c2-c1);
+  const dist=Math.max(Math.abs(r2-r1),Math.abs(c2-c1));
+  if(dr!==0&&dc!==0&&Math.abs(r2-r1)!==Math.abs(c2-c1))return"";
+  let s="";
+  for(let i=0;i<=dist;i++){s+=GRID[r1+dr*i][c1+dc*i];}
+  return s;
+}
+
+function checkWord(){
+  const s=getSelStr();
+  const sr=s.split("").reverse().join("");
+  for(const p of PLACED){
+    if((s===p.word||sr===p.word)&&!foundWords.has(p.word)){
+      foundWords.add(p.word);
+      p.cells.forEach(([r,c])=>{const el=cellAt(r,c);el.classList.add("found");el.classList.remove("selected");});
+      const wi=document.getElementById("wi-"+p.word);
+      if(wi){wi.classList.add("found");wi.querySelector(".wi-check").textContent="✓";}
+      document.getElementById("status").textContent="Found: "+p.word+"!";
+      if(foundWords.size===PLACED.length)onAllFound();
+      return;
+    }
+  }
+  allCells.forEach(c=>{if(!c.classList.contains("found"))c.classList.remove("selected");});
+  document.getElementById("status").textContent="";
+}
+
+function onAllFound(){
+  overlayEl.classList.add("hidden");
+  winBanner.classList.add("show");
+}
+
+function startSel(e){
+  if(!e.target.dataset.r)return;
+  selecting=true;
+  selStart=[parseInt(e.target.dataset.r),parseInt(e.target.dataset.c)];
+  selEnd=e.target;
+  highlightSel();
+}
+function extSel(e){
+  if(!selecting||!e.target.dataset.r)return;
+  selEnd=e.target;
+  highlightSel();
+}
+function endSel(e){
+  if(!selecting)return;
+  selecting=false;
+  checkWord();
+  selStart=null;selEnd=null;
+}
+document.addEventListener("mouseup",()=>{if(selecting){selecting=false;checkWord();selStart=null;selEnd=null;}});
+</script>
+</body>
+</html>
